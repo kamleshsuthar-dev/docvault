@@ -1,26 +1,107 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Core layout variables (Light Mode) */
+  --app-bg: #F4F0FF; /* color-light */
+  --app-fg: #131316; /* color-text-inverse */
+  --app-card: #E8E8F0; /* color-gray-100 */
+  --app-card-hover: rgba(0, 0, 0, 0.03); /* color-surface-hover-light */
+  --app-border: #C5C5D9; /* Lighter border color for light mode (WCAG contrast compliant and visually soft) */
+  --app-text-muted: #5C5C78; /* Darker muted text for light mode WCAG AA compliance (>= 4.5:1) */
+  
+  --font-sans: var(--font-geist-sans), "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
+/* Media query dark mode fallback */
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  :root:not(.light) {
+    --app-bg: #131316; /* color-bg / color-gray-950 */
+    --app-fg: #FFFFFF; /* color-text */
+    --app-card: #1E1E26; /* color-gray-800 */
+    --app-card-hover: rgba(255, 255, 255, 0.04); /* color-surface-hover */
+    --app-border: #3D3D50; /* color-gray-600 */
+    --app-text-muted: #7C7C99; /* color-gray-400 */
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Explicit class-based dark mode overrides */
+.dark {
+  --app-bg: #131316;
+  --app-fg: #FFFFFF;
+  --app-card: #1E1E26;
+  --app-card-hover: rgba(255, 255, 255, 0.04);
+  --app-border: #3D3D50;
+  --app-text-muted: #7C7C99;
 }
+
+.light {
+  --app-bg: #F4F0FF;
+  --app-fg: #131316;
+  --app-card: #E8E8F0;
+  --app-card-hover: rgba(0, 0, 0, 0.03);
+  --app-border: #C5C5D9;
+  --app-text-muted: #5C5C78;
+}
+
+@theme {
+  /* Tailwind standard configuration mappings */
+  --color-background: var(--app-bg);
+  --color-foreground: var(--app-fg);
+  --color-card: var(--app-card);
+  --color-card-hover: var(--app-card-hover);
+  --color-border: var(--app-border);
+  --color-muted-text: var(--app-text-muted);
+  
+  /* Primary Palette */
+  --color-brand: #6C47FF;
+  --color-brand-hover: #7C5CFF;
+  --color-brand-active: #5935E0;
+  --color-surface: #1F0256;
+  --color-light: #F4F0FF;
+  --color-text-dark: #FFFFFF;
+  --color-text-light: #131316;
+
+  /* Neutral Palette constant tokens */
+  --color-gray-950: #131316;
+  --color-gray-800: #1E1E26;
+  --color-gray-600: #3D3D50;
+  --color-gray-400: #7C7C99;
+  --color-gray-100: #E8E8F0;
+
+  /* Semantic Colors */
+  --color-success: #16A34A;
+  --color-error: #DC2626;
+  --color-warning: #D97706;
+
+  /* Interactive States constant tokens */
+  --color-disabled: #3D3D50;
+  --color-disabled-text: #7C7C99;
+  --color-focus-ring: rgba(108, 71, 255, 0.5);
+
+  /* Border Radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+
+  /* Elevation (Shadows) */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 16px rgba(108, 71, 255, 0.15);
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* Global focus styling for accessibility */
+*:focus-visible {
+  outline: 2px solid rgba(108, 71, 255, 0.5) !important;
+  outline-offset: 2px !important;
+}
+
+body {
+  background-color: var(--app-bg);
+  color: var(--app-fg);
+  font-family: var(--font-sans);
+  transition: background-color 300ms ease, color 300ms ease;
+}
+
+

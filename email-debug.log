@@ -1,0 +1,5 @@
+[2026-07-15T16:45:35.803Z] PATCH/PUT Request. DB Collabs: [], Body Collabs: [{"email":"kamleshsuthar240725@gmail.com","role":"editor"}]
+[2026-07-15T16:45:35.804Z] Calculated newCollabs: [{"email":"kamleshsuthar240725@gmail.com","role":"editor"}]
+[2026-07-15T16:45:36.034Z] SMTP settings detected. SMTP_USER: ketchupzplays@gmail.com
+[2026-07-15T16:45:36.035Z] Sending email to kamleshsuthar240725@gmail.com...
+[2026-07-15T16:45:41.939Z] Email sent successfully! Info: {"accepted":["kamleshsuthar240725@gmail.com"],"rejected":[],"ehlo":["SIZE 35882577","8BITMIME","AUTH LOGIN PLAIN XOAUTH2 PLAIN-CLIENTTOKEN OAUTHBEARER XOAUTH","ENHANCEDSTATUSCODES","PIPELINING","CHUNKING","SMTPUTF8"],"envelopeTime":1435,"messageTime":1224,"messageSize":662,"response":"250 2.0.0 OK  1784133941 a92af1059eb24-13cd432f1cesm4310204c88.11 - gsmtp","envelope":{"from":"ketchupzplays@gmail.com","to":["kamleshsuthar240725@gmail.com"]},"messageId":"<e8ef0bb2-e447-e0d5-5735-5b0384eb5c9c@gmail.com>"}

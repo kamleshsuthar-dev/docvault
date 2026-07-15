@@ -1,65 +1,92 @@
-import Image from "next/image";
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { auth } from '@clerk/nextjs/server';
+import { FileText, Users, ShieldCheck, ArrowRight } from 'lucide-react';
 
-export default function Home() {
+export default async function Home() {
+  const { userId } = await auth();
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <main className="min-h-[calc(100vh-65px)] bg-background text-foreground flex flex-col justify-center transition-colors duration-slow">
+      <div className="max-w-7xl mx-auto px-4 py-20 sm:px-6 lg:px-8">
+        <div className="text-center space-y-8 max-w-3xl mx-auto">
+          <Badge className="bg-brand/10 text-brand hover:bg-brand/20 border-brand/20 text-xs px-3 py-1 font-medium rounded-full">
+            Semester Homework RBAC Project
+          </Badge>
+          <h1 className="text-5xl sm:text-6xl font-bold tracking-tight bg-gradient-to-r from-brand via-brand-hover to-foreground bg-clip-text text-transparent pb-1">
+            DocVault
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="text-lg sm:text-xl text-muted-text max-w-2xl mx-auto font-light leading-relaxed">
+            A collaborative document workspace powered by Clerk. Experience real-time organization-wide workspaces, default teams, and Google-Docs-style email sharing.
           </p>
+
+          <div className="grid sm:grid-cols-3 gap-6 pt-12">
+            <Card className="bg-card border-border text-left hover:border-brand/40 hover:shadow-md transition-all duration-fast">
+              <CardHeader className="pb-3">
+                <FileText className="h-6 w-6 text-brand mb-2" />
+                <CardTitle className="text-foreground text-lg">Document CRUD</CardTitle>
+              </CardHeader>
+              <CardContent className="text-muted-text text-sm">
+                Create, edit, delete, and view documents. Dynamic access controls apply instantly in real-time.
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card border-border text-left hover:border-brand/40 hover:shadow-md transition-all duration-fast">
+              <CardHeader className="pb-3">
+                <Users className="h-6 w-6 text-brand mb-2" />
+                <CardTitle className="text-foreground text-lg">Teams & Workspaces</CardTitle>
+              </CardHeader>
+              <CardContent className="text-muted-text text-sm">
+                Organize documents under default teams or custom organizations. Managed natively through Clerk.
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card border-border text-left hover:border-brand/40 hover:shadow-md transition-all duration-fast">
+              <CardHeader className="pb-3">
+                <ShieldCheck className="h-6 w-6 text-success mb-2" />
+                <CardTitle className="text-foreground text-lg">Granular RBAC</CardTitle>
+              </CardHeader>
+              <CardContent className="text-muted-text text-sm">
+                Share privately with direct emails as Editor or Viewer. Clerk org membership roles sync automatically.
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="flex gap-4 justify-center pt-8">
+            {userId ? (
+              <Link href="/dashboard">
+                <Button size="lg" className="px-8 rounded-sm bg-brand hover:bg-brand-hover active:bg-brand-active text-white font-medium shadow-md hover:shadow-lg flex items-center gap-2 transition-all duration-fast">
+                  Go to Dashboard
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
+            ) : (
+              <>
+                <Link href="/signup">
+                  <Button size="lg" className="px-8 rounded-sm bg-brand hover:bg-brand-hover active:bg-brand-active text-white font-medium shadow-md hover:shadow-lg transition-all duration-fast">
+                    Get Started
+                  </Button>
+                </Link>
+                <Link href="/login">
+                  <Button size="lg" variant="outline" className="px-8 rounded-sm border-border bg-transparent text-foreground hover:bg-card-hover hover:text-foreground transition-all duration-fast">
+                    Sign In
+                  </Button>
+                </Link>
+              </>
+            )}
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+      </div>
+    </main>
+  );
+}
+
+// Local mock Badge component since we only need it for decoration
+function Badge({ children, className }: { children: React.ReactNode; className?: string }) {
+  return (
+    <span className={`inline-flex items-center rounded-md px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border ${className}`}>
+      {children}
+    </span>
   );
 }
