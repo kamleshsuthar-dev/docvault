@@ -3,8 +3,6 @@ import Document from '@/models/Document';
 import { auth, currentUser } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
-import fs from 'fs';
-import path from 'path';
 
 export async function GET(
   request: NextRequest,
@@ -133,10 +131,8 @@ export async function PATCH(
         }
 
         // Find newly added collaborators to send email invites
-        const logPath = path.join(process.cwd(), 'email-debug.log');
-        fs.appendFileSync(
-          logPath,
-          `[${new Date().toISOString()}] PATCH/PUT Request. DB Collabs: ${JSON.stringify(document.collaborators)}, Body Collabs: ${JSON.stringify(collaborators)}\n`
+        console.log(
+          `[Email Debug] PATCH/PUT Request. DB Collabs: ${JSON.stringify(document.collaborators)}, Body Collabs: ${JSON.stringify(collaborators)}`
         );
 
         const existingEmails = new Set(
@@ -146,9 +142,8 @@ export async function PATCH(
           (c: any) => !existingEmails.has(c.email.toLowerCase())
         );
 
-        fs.appendFileSync(
-          logPath,
-          `[${new Date().toISOString()}] Calculated newCollabs: ${JSON.stringify(newCollabs)}\n`
+        console.log(
+          `[Email Debug] Calculated newCollabs: ${JSON.stringify(newCollabs)}`
         );
 
         document.collaborators = collaborators;
@@ -159,13 +154,11 @@ export async function PATCH(
 
     // Send emails to newly added collaborators if SMTP or Resend is configured
     if (newCollabs.length > 0) {
-      const logPath = path.join(process.cwd(), 'email-debug.log');
       const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
       if (process.env.SMTP_USER && process.env.SMTP_PASS) {
-        fs.appendFileSync(
-          logPath,
-          `[${new Date().toISOString()}] SMTP settings detected. SMTP_USER: ${process.env.SMTP_USER}\n`
+        console.log(
+          `[Email Debug] SMTP settings detected. SMTP_USER: ${process.env.SMTP_USER}`
         );
         // Send email via SMTP (e.g. Gmail) using Nodemailer
         try {
@@ -179,9 +172,8 @@ export async function PATCH(
 
           for (const collab of newCollabs) {
             try {
-              fs.appendFileSync(
-                logPath,
-                `[${new Date().toISOString()}] Sending email to ${collab.email}...\n`
+              console.log(
+                `[Email Debug] Sending email to ${collab.email}...`
               );
               const info = await transporter.sendMail({
                 from: `"DocVault" <${process.env.SMTP_USER}>`,
@@ -191,29 +183,25 @@ export async function PATCH(
                        <p>You have been invited to collaborate as a <strong>${collab.role}</strong> on the document: <strong>${document.title}</strong>.</p>
                        <p><a href="${appUrl}/documents/${document._id}">Click here to access the document</a>.</p>`,
               });
-              fs.appendFileSync(
-                logPath,
-                `[${new Date().toISOString()}] Email sent successfully! Info: ${JSON.stringify(info)}\n`
+              console.log(
+                `[Email Debug] Email sent successfully! Info: ${JSON.stringify(info)}`
               );
             } catch (collabErr: any) {
               console.error('Failed to send SMTP invite to:', collab.email, collabErr);
-              fs.appendFileSync(
-                logPath,
-                `[${new Date().toISOString()}] SMTP send error for ${collab.email}: ${collabErr?.message || collabErr}\n`
+              console.error(
+                `[Email Debug] SMTP send error for ${collab.email}: ${collabErr?.message || collabErr}`
               );
             }
           }
         } catch (smtpInitErr: any) {
           console.error('SMTP initialization or execution error:', smtpInitErr);
-          fs.appendFileSync(
-            logPath,
-            `[${new Date().toISOString()}] SMTP Init/Exec error: ${smtpInitErr?.message || smtpInitErr}\n`
+          console.error(
+            `[Email Debug] SMTP Init/Exec error: ${smtpInitErr?.message || smtpInitErr}`
           );
         }
       } else if (process.env.RESEND_API_KEY) {
-        fs.appendFileSync(
-          logPath,
-          `[${new Date().toISOString()}] Resend API Key detected.\n`
+        console.log(
+          `[Email Debug] Resend API Key detected.`
         );
         // Fallback: Send email via Resend API
         for (const collab of newCollabs) {
@@ -234,22 +222,19 @@ export async function PATCH(
               }),
             });
             const resData = await res.json();
-            fs.appendFileSync(
-              logPath,
-              `[${new Date().toISOString()}] Resend response: ${JSON.stringify(resData)}\n`
+            console.log(
+              `[Email Debug] Resend response: ${JSON.stringify(resData)}`
             );
           } catch (emailErr: any) {
             console.error('Failed to send Resend invitation email to:', collab.email, emailErr);
-            fs.appendFileSync(
-              logPath,
-              `[${new Date().toISOString()}] Resend send error for ${collab.email}: ${emailErr?.message || emailErr}\n`
+            console.error(
+              `[Email Debug] Resend send error for ${collab.email}: ${emailErr?.message || emailErr}`
             );
           }
         }
       } else {
-        fs.appendFileSync(
-          logPath,
-          `[${new Date().toISOString()}] Neither SMTP nor Resend is configured.\n`
+        console.log(
+          `[Email Debug] Neither SMTP nor Resend is configured.`
         );
       }
     }
