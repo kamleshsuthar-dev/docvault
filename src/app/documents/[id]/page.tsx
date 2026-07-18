@@ -35,6 +35,7 @@ export default function DocumentPage({ params }: { params: Promise<{ id: string 
   const { userId, orgId } = useAuth();
   const { user, isLoaded: userLoaded } = useUser();
   const [document, setDocument] = useState<Document | null>(null);
+  const [userRole, setUserRole] = useState<string>('viewer');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -53,6 +54,7 @@ export default function DocumentPage({ params }: { params: Promise<{ id: string 
       }
       const data = await response.json();
       setDocument(data.document);
+      setUserRole(data.userRole || 'viewer');
     } catch (err: any) {
       setError(err.message || 'Failed to load document');
     } finally {
@@ -163,10 +165,10 @@ export default function DocumentPage({ params }: { params: Promise<{ id: string 
   }
 
   // Determine user authorization role
-  const isOwner = document.ownerId === userId;
-  const userEmail = user?.emailAddresses[0]?.emailAddress.toLowerCase();
-  const collaboratorInfo = document.collaborators.find((c) => c.email.toLowerCase() === userEmail);
-  const isEditor = isOwner || collaboratorInfo?.role === 'editor';
+  const isOwner = userRole === 'owner';
+  const isEditor = isOwner || userRole === 'editor';
+  const userEmail = user?.emailAddresses[0]?.emailAddress?.toLowerCase() || '';
+  const collaboratorInfo = document.collaborators.find((c) => c.email?.toLowerCase() === userEmail);
 
   return (
     <main className="min-h-[calc(100vh-65px)] bg-background transition-colors duration-slow py-8">
@@ -255,7 +257,7 @@ export default function DocumentPage({ params }: { params: Promise<{ id: string 
                 <div className="space-y-1.5">
                   <span className="text-xs font-semibold text-muted-text block uppercase tracking-wider">Your Access Level</span>
                   <Badge className="bg-brand text-white text-xs px-2.5 py-0.5 capitalize shadow-sm">
-                    {isOwner ? 'Owner' : collaboratorInfo?.role || 'Viewer'}
+                    {isOwner ? 'Owner' : (userRole === 'editor' ? 'Editor' : 'Viewer')}
                   </Badge>
                 </div>
               </div>

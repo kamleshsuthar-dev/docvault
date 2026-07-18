@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const email = user.emailAddresses[0]?.emailAddress.toLowerCase();
+    const email = user.emailAddresses[0]?.emailAddress?.toLowerCase() || '';
 
     await connectDB();
 

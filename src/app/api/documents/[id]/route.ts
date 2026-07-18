@@ -9,7 +9,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { userId, orgId } = await auth();
+    const { userId, orgId, orgRole } = await auth();
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -18,7 +18,7 @@ export async function GET(
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-    const email = user.emailAddresses[0]?.emailAddress.toLowerCase();
+    const email = user.emailAddresses[0]?.emailAddress?.toLowerCase() || '';
 
     const { id } = await params;
     await connectDB();
@@ -47,7 +47,9 @@ export async function GET(
     if (isOwner) {
       userRole = 'owner';
     } else if (isOrgMember) {
-      userRole = 'editor'; // org members have write access by default
+      // org members have write access by default, unless they have the explicit viewer role
+      const isViewer = orgRole === 'org:viewer' || orgRole === 'viewer';
+      userRole = isViewer ? 'viewer' : 'editor';
     } else if (collaborator) {
       userRole = collaborator.role;
     }
@@ -76,7 +78,7 @@ export async function PATCH(
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-    const email = user.emailAddresses[0]?.emailAddress.toLowerCase();
+    const email = user.emailAddresses[0]?.emailAddress?.toLowerCase() || '';
 
     const { id } = await params;
     await connectDB();
@@ -96,8 +98,9 @@ export async function PATCH(
       (c: any) => c.email.toLowerCase() === email
     );
 
-    // Can only edit if owner, org member, or editor collaborator
-    const canEdit = isOwner || isOrgMember || (collaborator && collaborator.role === 'editor');
+    // Can only edit if owner, org member (who is not a viewer), or editor collaborator
+    const isOrgEditor = isOrgMember && orgRole !== 'org:viewer' && orgRole !== 'viewer';
+    const canEdit = isOwner || isOrgEditor || (collaborator && collaborator.role === 'editor');
     if (!canEdit) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }

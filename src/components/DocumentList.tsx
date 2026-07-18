@@ -81,14 +81,16 @@ export default function DocumentList() {
   }
 
   // Filter documents into owned/org vs shared
-  const userEmail = user?.emailAddresses[0]?.emailAddress.toLowerCase();
+  const userEmail = user?.emailAddresses[0]?.emailAddress?.toLowerCase() || '';
   
   const workspaceDocs = documents.filter(doc => 
-    doc.ownerId === userId || (orgId && doc.orgId === orgId)
+    orgId ? doc.orgId === orgId : (doc.orgId === null && doc.ownerId === userId)
   );
 
   const sharedDocs = documents.filter(doc => 
-    doc.ownerId !== userId && (!orgId || doc.orgId !== orgId) && doc.collaborators.some(c => c.email.toLowerCase() === userEmail)
+    doc.ownerId !== userId && 
+    doc.collaborators.some(c => c.email?.toLowerCase() === userEmail) &&
+    (orgId ? doc.orgId !== orgId : doc.orgId === null)
   );
 
   return (

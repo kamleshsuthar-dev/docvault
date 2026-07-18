@@ -8,7 +8,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useUser, useOrganizationList, useAuth } from '@clerk/nextjs';
 import { Plus, X } from 'lucide-react';
-import { useRef } from 'react';
+
+// Track initialization attempts per user to prevent duplicate creations
+// during React Strict Mode double-renders or component remounts.
+const orgInitAttempts = new Set<string>();
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -17,7 +20,6 @@ export default function DashboardPage() {
   const [showForm, setShowForm] = useState(false);
   const [creatingDoc, setCreatingDoc] = useState(false);
   const [isInitializingOrg, setIsInitializingOrg] = useState(false);
-  const hasAttemptedInit = useRef(false);
 
   // Get organization list hook
   const { 
@@ -33,18 +35,20 @@ export default function DashboardPage() {
 
   // Auto-initialize a default workspace (organization) for new signups
   useEffect(() => {
+    if (!user?.id) return;
+
     if (
       isLoaded && 
       listLoaded && 
+      !userMemberships.isLoading &&
       userMemberships.data && 
       userMemberships.data.length === 0 && 
-      user && 
       createOrganization && 
       setActive &&
       !isInitializingOrg &&
-      !hasAttemptedInit.current
+      !orgInitAttempts.has(user.id)
     ) {
-      hasAttemptedInit.current = true;
+      orgInitAttempts.add(user.id);
       const initDefaultOrg = async () => {
         setIsInitializingOrg(true);
         try {
@@ -55,14 +59,14 @@ export default function DashboardPage() {
           }
         } catch (e) {
           console.error("Auto-workspace creation failed:", e);
-          hasAttemptedInit.current = false;
+          orgInitAttempts.delete(user.id);
         } finally {
           setIsInitializingOrg(false);
         }
       };
       initDefaultOrg();
     }
-  }, [isLoaded, listLoaded, userMemberships.data, user, createOrganization, setActive, isInitializingOrg]);
+  }, [isLoaded, listLoaded, userMemberships.isLoading, userMemberships.data, user, createOrganization, setActive, isInitializingOrg]);
 
   const handleCreateDocument = async (data: { title: string; content: string }) => {
     setCreatingDoc(true);
