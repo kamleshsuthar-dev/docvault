@@ -18,7 +18,7 @@ export default async function Home() {
             DocVault
           </h1>
           <p className="text-lg sm:text-xl text-muted-text max-w-2xl mx-auto font-light leading-relaxed">
-            A collaborative document workspace powered by Clerk. Experience real-time organization-wide workspaces, default teams, and Google-Docs-style email sharing.
+            A secure, collaborative document workspace. Experience real-time organization-wide workspaces, default teams, granular role-based permissions, and Google-Docs-style direct document sharing.
           </p>
 
           <div className="grid sm:grid-cols-3 gap-6 pt-12">
@@ -38,7 +38,7 @@ export default async function Home() {
                 <CardTitle className="text-foreground text-lg">Teams & Workspaces</CardTitle>
               </CardHeader>
               <CardContent className="text-muted-text text-sm">
-                Organize documents under default teams or custom organizations. Managed natively through Clerk.
+                Organize documents under default teams or custom organization scopes with isolated workspaces.
               </CardContent>
             </Card>
 
@@ -48,7 +48,7 @@ export default async function Home() {
                 <CardTitle className="text-foreground text-lg">Granular RBAC</CardTitle>
               </CardHeader>
               <CardContent className="text-muted-text text-sm">
-                Share privately with direct emails as Editor or Viewer. Clerk org membership roles sync automatically.
+                Share privately with direct emails as Editor or Viewer. Organization membership roles and fine-grained sharing policies sync automatically.
               </CardContent>
             </Card>
           </div>
